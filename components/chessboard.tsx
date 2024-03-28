@@ -1,17 +1,42 @@
 'use client';
 
-import { KNIGHT_IMAGE, PAWN_IMAGE } from '@/constants';
-import { isHasItemChild } from '@/lib/knight';
-import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useState } from 'react';
+import { KNIGHT_IMAGE, PAWN_IMAGE } from '@/constants';
+import { isHasItemChild, knightPositions } from '@/lib/knight';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-const pawns = ['a1', 'b6', 'c3', 'e5', 'f8', 'h4'];
-
 export const Chessboard = () => {
+  const [buttonState, setButtonState] = useState<'has-item' | 'clear'>('clear');
+  const [pawns, setPawns] = useState<string[]>([]);
+  const [knights, setKnights] = useState<string[]>([]);
+
+  const handleSetPawns = (col: string) => {
+    if (pawns.includes(col)) {
+      setPawns(pawns.filter((pawn) => pawn !== col));
+      return;
+    }
+    setPawns([...pawns, col]);
+  };
+
+  const handleClearPawns = () => {
+    setPawns([]);
+    setKnights([]);
+    setButtonState('clear');
+  };
+
+  const handleFindKnightPositions = () => {
+    const newKnights = knightPositions(pawns);
+
+    setKnights(newKnights.filter((knight) => !pawns.includes(knight)));
+
+    setButtonState('has-item');
+  };
+
   return (
     <>
-      <div className="w-[600px] h-[600px] shadow-lg border-8">
+      <div className="w-[600px] h-[600px] shadow-lg border-8 select-none">
         <div className="flex flex-col h-full">
           {Array.from({ length: 8 }).map((_, i) => {
             return (
@@ -19,7 +44,10 @@ export const Chessboard = () => {
                 {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((col, j) => {
                   return (
                     <div
-                      role="cell"
+                      onClick={
+                        buttonState === 'clear' ? () => handleSetPawns(`${col}${8 - i}`) : undefined
+                      }
+                      role={buttonState === 'clear' ? 'button' : undefined}
                       key={j}
                       className={cn(
                         'relative flex-1 flex justify-center items-center',
@@ -27,9 +55,12 @@ export const Chessboard = () => {
                       )}
                     >
                       {i === 7 && <div className="absolute bottom-1 left-1">{col}</div>}
-                      {col === 'h' && <div className="absolute top-1 right-1">{i + 1}</div>}
-                      {isHasItemChild(pawns, `${col}${i + 1}`, 'pawn') && (
+                      {col === 'h' && <div className="absolute top-1 right-1">{8 - i}</div>}
+                      {isHasItemChild(pawns, `${col}${8 - i}`) && (
                         <Image src={PAWN_IMAGE} alt="PAWN" width={40} height={40} />
+                      )}
+                      {isHasItemChild(knights, `${col}${8 - i}`) && (
+                        <Image src={KNIGHT_IMAGE} alt="KNIGHT" width={40} height={40} />
                       )}
                     </div>
                   );
@@ -39,8 +70,10 @@ export const Chessboard = () => {
           })}
         </div>
       </div>
-      <div>
-        <Button>Find Possible Knight Positions</Button>
+      <div className="mt-3">
+        <Button disabled={pawns.length === 0} onClick={buttonState === 'clear' ? handleFindKnightPositions : handleClearPawns}>
+          {buttonState === 'clear' ? 'Find Possible Knight Positions' : 'Clear All'}
+        </Button>
       </div>
     </>
   );

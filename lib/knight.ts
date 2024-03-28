@@ -1,6 +1,4 @@
-import { KNIGHT_IMAGE, PAWN_IMAGE } from '@/constants';
-
-function knightPositions(pawnPositions: string[]): string[] {
+export const knightPositions = (pawnPositions: string[]): string[] => {
   const board: number[][] = Array(8)
     .fill(0)
     .map(() => Array(8).fill(0));
@@ -44,21 +42,11 @@ function knightPositions(pawnPositions: string[]): string[] {
   }
 
   return positions;
-}
+};
 
 /**
  * @param cell - format: 'a1' which `a` is column and `1` is row
  */
-export const isHasItemChild = (
-  pawns: string[],
-  cell: string,
-  imgObj: 'pawn' | 'knight'
-): string | null => {
-  if (!pawns.includes(cell)) return null;
-
-  if (imgObj === 'pawn') {
-    return PAWN_IMAGE;
-  }
-
-  return KNIGHT_IMAGE;
+export const isHasItemChild = (pawns: string[], cell: string): boolean => {
+  return pawns.includes(cell);
 };
