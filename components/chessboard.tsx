@@ -6,6 +6,8 @@ import { KNIGHT_IMAGE, PAWN_IMAGE } from '@/constants';
 import { isHasItemChild, knightPositions } from '@/lib/knight';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 
 export const Chessboard = () => {
   const [buttonState, setButtonState] = useState<'has-item' | 'clear'>('clear');
@@ -36,6 +38,12 @@ export const Chessboard = () => {
 
   return (
     <>
+      <Alert className="w-[600px] mb-2">
+        <AlertTitle className='flex gap-2 items-center'>
+          <Info className='inline-block' /> Tips!
+        </AlertTitle>
+        <AlertDescription>Click on column to locate your pawns.</AlertDescription>
+      </Alert>
       <div className="w-[600px] h-[600px] shadow-lg border-8 select-none">
         <div className="flex flex-col h-full">
           {Array.from({ length: 8 }).map((_, i) => {
@@ -71,7 +79,10 @@ export const Chessboard = () => {
         </div>
       </div>
       <div className="mt-3">
-        <Button disabled={pawns.length === 0} onClick={buttonState === 'clear' ? handleFindKnightPositions : handleClearPawns}>
+        <Button
+          disabled={pawns.length === 0}
+          onClick={buttonState === 'clear' ? handleFindKnightPositions : handleClearPawns}
+        >
           {buttonState === 'clear' ? 'Find Possible Knight Positions' : 'Clear All'}
         </Button>
       </div>
